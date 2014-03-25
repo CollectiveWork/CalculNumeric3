@@ -16,7 +16,7 @@ public class CalculNumericTema3 {
      Se va rula pentru matricile de marimea n=20, 50, 100, iar epsilon = 10^(-10)
      */
 
-    final String DOUBLE_DISPLAY_FORMAT = "%+10g";
+    final String DOUBLE_DISPLAY_FORMAT = "%+2g";
     final String RESULT_DISPLAY_FORMAT = "%+10g";;
     final Integer SYST_SIZE = 4;
     final double epsilon = 10e-10;
@@ -107,6 +107,7 @@ public class CalculNumericTema3 {
                 temp_b[i] = sigma * b[i];
             }
             double er = 0.0;
+            
             do {
                 double y[] = new double[n];
 
@@ -137,7 +138,7 @@ public class CalculNumericTema3 {
             //System.out.println("N: " + n);
             
         }
-        System.out.printf("\n%50s\n\n(", "METODA JACOBI RELAXATA");
+         System.out.printf("\n%30s (", "METODA JACOBI RELAXATA");
             for (int j = 1; j < n; j++) {
                 System.out.printf(" " + RESULT_DISPLAY_FORMAT + " ", x_JR[j]);
             }
@@ -150,39 +151,50 @@ public class CalculNumericTema3 {
         int nn;
         for (int k = 1; k < p-1; k ++) {
             sigma = (2*k)/p;
-            nn = 0; //x = 0
+           
             double er = 0.0;
+            double x_n[] = new double[n];
+            double x_n_1[] = new double[n];
+            for(int i = 1; i < n; i ++){
+                //x_GS[i] = 0.0;
+                x_n[i] = 0.0;
+                x_n_1[i] = 0.0;
+            }
+            nn = 0;
             
             do{
+                
+                
                 for(int i = 1; i < n; i ++){
                     if(i == 1){
                         double suma = 0.0;
-                        for(int j = 1; j < nn+1; j++)
-                            suma += A[i][j]*x_GS[j];
-                        x_GS[i] = (1-sigma)*x_GS[i] - ((sigma/A[i][i])*(b[i] - suma));
+                        
+                        for(int j = 1; j < n; j++)
+                            suma += A[i][j]*x_n[j];
+                        x_n_1[i] = (1-sigma)*x_GS[i] - ((sigma/A[i][i])*(b[i] - suma));
                     }else{
                         double suma1 = 0.0;
                         double suma2 = 0.0;
                         for (int j = 1; j <= i-1; j++) {
-                            suma1 += A[i][j] * x_GS[j];
+                            suma1 += A[i][j] * x_n_1[j];
                         }
                         for (int j = i + 1; j <n; j++) {
-                            suma1 += A[i][j] * x_GS[j];
+                            suma1 += A[i][j] * x_n[j];
                         }
-                         x_GS[i] = (1 - sigma) * x_GS[i] - ((sigma/A[i][i])*(b[i] - suma1 - suma2));
+                         x_n_1[i] = (1 - sigma) * x_n[i] - ((sigma/A[i][i])*(b[i] - suma1 - suma2));
                     }
                         
                 }
                 
                 double y[] = new double[n];
                 for(int i = 1; i < n ; i++)
-                    y[i] = x_GS[i];
+                    y[i] = x_n_1[i];
                 
                 double norma_suma = 0.0;
                 for (int i = 1; i < n; i++) {
                     double suma = 0.0;
                     for (int j = 1; j < n; j++) {
-                        suma += A[i][j]*(y[i] - x_GS[i])*(y[j] - x_GS[j]);
+                        suma += A[i][j]*(y[i] - x_n_1[i])*(y[j] - x_n_1[j]);
                     }
                     norma_suma += suma;
 
@@ -190,13 +202,15 @@ public class CalculNumericTema3 {
                 er = norma_suma;
                 for(int i = 1; i < n ; i++)
                     x_GS[i] = y[i];
+                
                 nn++;
-               
+               for(int i = 1; i < n ; i++)
+                    x_n[i] = x_n_1[i];
                 
             }while (er >= epsilon);
             
         }
-         System.out.printf("\n%50s\n\n(", "METODA GAUSS-SEIDEL RELAXATA");
+         System.out.printf("\n%30s (", "METODA GAUSS-SEIDEL RELAXATA");
             for (int j = 1; j < n; j++) {
                 System.out.printf(" " + RESULT_DISPLAY_FORMAT + " ", x_GS[j]);
             }
@@ -213,6 +227,7 @@ public class CalculNumericTema3 {
         cnt3.initArrays();
         cnt3.printSystem(cnt3.x);
         cnt3.JR(cnt3.SYST_SIZE * 1000);
-        cnt3.GS(cnt3.SYST_SIZE * 10);
+        cnt3.GS(cnt3.SYST_SIZE * 1);
+        System.out.println("");
     }
 }
