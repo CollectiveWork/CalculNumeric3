@@ -293,6 +293,6 @@ public class CalculNumericTema3 {
         cnt3.JR(cnt3.SYST_SIZE * 1000);
         cnt3.GS(cnt3.SYST_SIZE * 1000);
         cnt3.GC();
-        System.out.println("");
+        System.out.print("\n\n");
     }
 }
