@@ -18,7 +18,7 @@ public class CalculNumericTema3 {
 
     final String DOUBLE_DISPLAY_FORMAT = "%+g";
     final String RESULT_DISPLAY_FORMAT = "%+15g";
-    final Integer SYST_SIZE = 4;
+    Integer SYST_SIZE = 100;
     final double epsilon = 10e-10;
 
     double A[][];
@@ -145,6 +145,85 @@ public class CalculNumericTema3 {
         System.out.printf(")");
     }
 
+    protected void JR_alt(int iteratii){
+        double 
+                max = 0.0,
+                suma = 0.0,
+                sigma = 0.0,
+                sigmao = 0.0,
+                p = iteratii,
+                t,
+                er = 0.0;
+        int m, mo = 0;
+        double b1[][] = new double[n][n];
+        double b2[] = new double[n];
+        double y[] = new double[n];
+        double xo[] = new double[n];
+	for (int i = 1; i < n; i++)
+	{
+		suma = 0;
+		for (int j = 1; j < n; j++)
+			suma = suma + A[i][j];
+		if (suma>max)
+			max = suma;
+	}
+	t = max;
+	for (int k = 1; k < p - 1; k++)
+	{
+		sigma = ((2 * k) / (p*t));
+		for (int i = 1; i < n; i++)
+			b1[i][i] = 1 - sigma*A[i][i];
+		for (int i = 1; i < n; i++)
+		for (int j = 1; j < n; j++)
+		if (i != j)
+			b1[i][j] = (-1)*sigma*A[i][j];
+		for (int i = 1; i < n; i++)
+			b2[i] = sigma*b[i];
+		for (int i = 1; i < n; i++)
+			x[i] = 0;
+		m = 0;
+		do
+		{
+			for (int i = 1; i < n; i++)
+			{
+				suma = 0;
+				for (int j = 1; j < n; j++)
+					suma = suma + b1[i][j] * x[j];
+				y[i] = suma + b2[i];
+			}
+			suma = 0;
+			for (int i = 1; i < n; i++)
+			for (int j = 1; j < n; j++)
+				suma = suma + A[i][j] * (y[i] - x[i])*(y[j] - x[j]);
+			er = (sqrt(suma));
+			for (int i = 1; i < n; i++)
+				x[i] = y[i];
+			m++;
+		} while (er >= epsilon);
+		if (k == 1)
+		{
+			mo = m;
+			sigmao = sigma;
+			for (int i = 1; i < n; i++)
+				xo[i] = x[i];
+		}
+		else if (m < mo)
+		{
+			mo = m;
+			sigmao = sigma;
+			for (int i = 1; i < n; i++)
+				xo[i] = x[i];
+		}
+	}
+	
+        System.out.printf("\n%30s (", "METODA JACOBI RELAXATA");
+        for (int j = 1; j < n; j++) {
+            System.out.printf(" " + RESULT_DISPLAY_FORMAT + " ", xo[j]);
+        }
+        System.out.printf(") n0 = " + mo + " | sigma = " + sigmao);
+        
+    }
+    
     protected void GS(int iteratii) {
         double sigma = 0.0, sigmao = 0.0;
         double xo[] = new double[n];
@@ -219,11 +298,11 @@ public class CalculNumericTema3 {
     }
 
     protected void GC() {
-        double alfa[] = new double[n];
-        double ci[] = new double[n];
-        double xi[][] = new double[n][n];
-        double ri[][] = new double[n][n];
-        double vi[][] = new double[n][n];
+        double alfa[] = new double[n*n];
+        double ci[] = new double[n*n];
+        double xi[][] = new double[n*n][n];
+        double ri[][] = new double[n*n][n];
+        double vi[][] = new double[n*n][n];
         double suma = 0.0, suma2 = 0.0, suma3 = 0.0, er = 0.0;
 
         for (int i = 1; i < n; i++) {
@@ -276,8 +355,8 @@ public class CalculNumericTema3 {
             for (int i = 1; i < n; i++) {
                 vi[k + 1][i] = ri[k + 1][i] + ci[k] * vi[k][i];
             }
-
-        } while (er >= epsilon && k++ < n-2);
+            k++;
+        } while (er >= epsilon );
 
         System.out.printf("\n%30s (", "METODA GRADIENTULUI GONJUGAT");
         for (int j = 1; j < n; j++) {
@@ -286,13 +365,26 @@ public class CalculNumericTema3 {
         System.out.printf(") ");
     }
 
+    protected void run(Integer sistemSize){
+        SYST_SIZE = sistemSize;
+        initArrays();
+         System.out.printf("\n%30s (", "MATRICE " + SYST_SIZE + "x" + SYST_SIZE);
+        for (int j = 1; j < n; j++) {
+            String s = "X" + (j-1);
+            System.out.printf(" %15s ", s);
+        }
+        System.out.printf(") ");
+        
+        JR_alt(SYST_SIZE );
+        GS(SYST_SIZE);
+        GC();
+        System.out.print("\n");
+    }
+    
     public static void main(String[] args) {
         CalculNumericTema3 cnt3 = new CalculNumericTema3();
-        cnt3.initArrays();
-        cnt3.printSystem(cnt3.x);
-        cnt3.JR(cnt3.SYST_SIZE * 1000);
-        cnt3.GS(cnt3.SYST_SIZE * 1000);
-        cnt3.GC();
-        System.out.print("\n\n");
+        cnt3.run(20);
+        cnt3.run(50);
+        cnt3.run(100);
     }
 }
